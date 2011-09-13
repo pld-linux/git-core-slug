@@ -14,7 +14,6 @@ BuildRequires:	rpmbuild(macros) >= 1.219
 Requires:	git-core
 Requires:	python-modules
 Suggests:	openssh-clients
-BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
