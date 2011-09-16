@@ -20,8 +20,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Python tools to interact with PLD git repositories.
 
 %prep
-%setup -q
-
+%setup -qc
+mv draenog-slug-*/* .
 
 %build
 %{__python} setup.py build
