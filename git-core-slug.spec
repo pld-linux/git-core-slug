@@ -6,8 +6,8 @@ Version:	0.1
 Release:	1
 License:	GPL v2
 Group:		Development/Building
-Source0:	%{name}-%{version}.tar.gz
-# Source0-md5:	cb4fad8ff51b95077b5cbd7d5ceb3682
+Source0:	https://github.com/draenog/slug/tarball/v%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	f2bd15936300fc2ed08037ebc6e7df88
 URL:		https://github.com/draenog/slug
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.219
