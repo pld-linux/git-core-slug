@@ -9,6 +9,7 @@ Group:		Development/Building
 Source0:	https://github.com/draenog/slug/tarball/v%{version}/%{name}-%{version}.tar.gz
 # Source0-md5:	9eacfe391c7b3a359dae214a4493a497
 URL:		https://github.com/draenog/slug
+BuildRequires:	python3-modules
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.219
 Requires:	git-core
