@@ -12,7 +12,7 @@ URL:		https://github.com/draenog/slug
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.219
 Requires:	git-core
-Requires:	python-modules
+Requires:	python3-modules
 Suggests:	openssh-clients
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -24,11 +24,11 @@ Python tools to interact with PLD git repositories.
 mv draenog-slug-*/* .
 
 %build
-%{__python} setup.py build
+%{__python3} setup.py build
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%{__python} setup.py install \
+%{__python3} setup.py install \
 	--skip-build \
 	--optimize=2 \
 	--root=$RPM_BUILD_ROOT
@@ -49,7 +49,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/slug.py
 %{_libdir}/git-core/git-pld
-%{py_sitescriptdir}/%{module}
+%{py3_sitescriptdir}/%{module}
 %if "%{py_ver}" > "2.4"
-%{py_sitescriptdir}/git_core_slug-*.egg-info
+%{py3_sitescriptdir}/git_core_slug-*.egg-info
 %endif
