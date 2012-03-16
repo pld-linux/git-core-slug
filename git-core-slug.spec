@@ -7,7 +7,7 @@ Release:	1
 License:	GPL v2
 Group:		Development/Building
 Source0:	https://github.com/draenog/slug/tarball/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	c070c539d8a67399b729537cc3ace456
+# Source0-md5:	589bbb9a23f591d17f4e95a32e54b990
 Source1:	slug_watch.init
 URL:		https://github.com/draenog/slug
 BuildRequires:	asciidoc
