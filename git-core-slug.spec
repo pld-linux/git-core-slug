@@ -2,13 +2,14 @@
 %define 	module	git_slug
 Summary:	Tools to interact with PLD git repositories
 Name:		git-core-slug
-Version:	0.8
+Version:	0.9
 Release:	1
 License:	GPL v2
 Group:		Development/Building
 Source0:	https://github.com/draenog/slug/tarball/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	589bbb9a23f591d17f4e95a32e54b990
+# Source0-md5:	747af0b97c200cc1a2d9ed4e5daa0638
 Source1:	slug_watch.init
+Source2:	crontab
 URL:		https://github.com/draenog/slug
 BuildRequires:	asciidoc
 BuildRequires:	docbook-dtd45-xml
@@ -63,6 +64,7 @@ install -d $RPM_BUILD_ROOT/home/services/gitolite/{watchdir,Refs}
 install -d $RPM_BUILD_ROOT/home/services/gitolite/Attic
 touch $RPM_BUILD_ROOT/home/services/gitolite/{watchdir,Refs}
 
+install -D %{SOURCE2} $RPM_BUILD_ROOT/etc/cron.d/slug_watch
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -94,6 +96,7 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/slug_watch
 %attr(754,root,root) /etc/rc.d/init.d/slug_watch
+/etc/cron.d/slug_watch
 %attr(755,gitolite,gitolite) /home/services/gitolite/adc/bin/trash
 %{py3_sitescriptdir}/Daemon
 %{py3_sitescriptdir}/%{module}//serverconst.py
