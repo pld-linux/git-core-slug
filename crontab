@@ -2,4 +2,4 @@ SHELL=/bin/sh
 MAILTO=root
 
 03 5 * * * gitolite git --git-dir=/home/services/gitolite/repositories/Refs.git gc --aggressive
-@hourly    gitolite git --git-dir=/home/services/gitolite/repositories/Refs.git gc
+33 * * * *    gitolite git --git-dir=/home/services/gitolite/repositories/Refs.git gc
