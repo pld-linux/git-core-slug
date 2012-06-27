@@ -14,9 +14,16 @@
 # Source function library
 . /etc/rc.d/init.d/functions
 
+# Source slug_watch configuration
+. /etc/sysconfig/slug_watch
+
 
 pidfile="/var/run/slug_watch.pid"
 
+if [ ! -n "$WATCHDIR"  -o ! -n "$REFREPODIR" ]; then
+	echo "WATCHDIR or REFREPODIR variable not set"
+	exit 1
+fi
 
 start() {
 	# Check if the service is already running?
@@ -26,7 +33,7 @@ start() {
 	fi
 
 	msg_starting "slug_watch"
-	daemon /usr/bin/slug_watch -u gitolite -d start 
+	daemon /usr/bin/slug_watch -u git -w "$WATCHDIR" -r "$REFREPODIR" $OTHER_OPTIONS -d start 
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/slug_watch
 }
