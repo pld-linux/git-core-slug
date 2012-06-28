@@ -31,6 +31,7 @@ Summary:	Daemon to update Refs repository for git-slug
 Group:		Development/Building
 Requires:	git-core-slug
 Requires:	pld-gitolite
+Requires:	python3-pyinotify
 Requires(post,preun):	/sbin/chkconfig
 Requires:	rc-scripts
 
