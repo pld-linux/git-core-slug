@@ -64,7 +64,6 @@ install -D %SOURCE1 $RPM_BUILD_ROOT/etc/rc.d/init.d/slug_watch
 install -d $RPM_BUILD_ROOT/home/services/git/.gitolite/hooks/common
 cp -r post-receive.python.d $RPM_BUILD_ROOT/home/services/git/.gitolite/hooks/common
 install -d $RPM_BUILD_ROOT/home/services/git/{watchdir,Refs}
-install -d $RPM_BUILD_ROOT/home/services/git/Attic
 touch $RPM_BUILD_ROOT/home/services/git/{watchdir,Refs}
 
 install -D %{SOURCE2} $RPM_BUILD_ROOT/etc/cron.d/slug_watch
@@ -104,6 +103,5 @@ fi
 %attr(755,git,git) /home/services/git/adc/bin/move
 %{py3_sitescriptdir}/Daemon
 %attr(644,git,git) /home/services/git/.gitolite/hooks/common/post-receive.python.d/slug_hook.py
-%attr(744,git,git) %dir /home/services/git/Attic
 %attr(744,git,git) %dir /home/services/git/watchdir
 %attr(744,git,git) %dir /home/services/git/Refs
