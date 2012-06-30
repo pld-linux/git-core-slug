@@ -2,15 +2,16 @@
 %define 	module	git_slug
 Summary:	Tools to interact with PLD git repositories
 Name:		git-core-slug
-Version:	0.11
+Version:	0.12
 Release:	1
 License:	GPL v2
 Group:		Development/Building
 Source0:	https://github.com/draenog/slug/tarball/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	3f72c638fdd47637680b1c49cfd70d1b
+# Source0-md5:	a1fe08e76e34ab566f99b1695b8128ed
 Source1:	slug_watch.init
 Source2:	crontab
 Source3:	slug_watch.sysconfig
+Source4:	slug_watch-cron
 URL:		https://github.com/draenog/slug
 BuildRequires:	asciidoc
 BuildRequires:	docbook-dtd45-xml
@@ -69,6 +70,7 @@ touch $RPM_BUILD_ROOT/home/services/git/{watchdir,Refs}
 
 install -D %{SOURCE2} $RPM_BUILD_ROOT/etc/cron.d/slug_watch
 install -D %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/slug_watch
+install -D %{SOURCE4} $RPM_BUILD_ROOT/%{_bindir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -97,8 +99,9 @@ fi
 %files watch
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/slug_watch
+%attr(755,root,root) %{_bindir}/slug_watch-cron
 %attr(754,root,root) /etc/rc.d/init.d/slug_watch
-/etc/cron.d/slug_watch
+%config(noreplace) %verify(not md5 mtime size) /etc/cron.d/slug_watch
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/slug_watch
 %attr(755,git,git) /home/services/git/adc/bin/trash
 %attr(755,git,git) /home/services/git/adc/bin/move

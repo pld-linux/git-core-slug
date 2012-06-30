@@ -3,4 +3,4 @@
 WATCHDIR="watchdir"
 REFREPODIR="repositories"
 
-OTHER_OPTIONS="-m git"
+OTHER_OPTIONS="-m root -s git"
