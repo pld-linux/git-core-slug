@@ -1,5 +1,5 @@
 SHELL=/bin/sh
 MAILTO=root
 
-03 5 * * *      git  git --git-dir=/home/services/git/repositories/Refs.git gc --aggressive
-*/15 * * * *    git  git --git-dir=/home/services/git/repositories/Refs.git gc
+03 5 * * *     git /usr/bin/slug_watch-cron --aggressive
+*/15 * * * *   git /usr/bin/slug_watch-cron
