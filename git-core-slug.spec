@@ -1,4 +1,3 @@
-
 %define 	module	git_slug
 Summary:	Tools to interact with PLD git repositories
 Name:		git-core-slug
@@ -56,21 +55,22 @@ rm -rf $RPM_BUILD_ROOT
 	--optimize=2 \
 	--root=$RPM_BUILD_ROOT
 
-%{make} man-install DESTDIR=$RPM_BUILD_ROOT
+%{__make} man-install \
+	DESTDIR=$RPM_BUILD_ROOT
 
 install -d $RPM_BUILD_ROOT%{_libdir}/git-core
 ln -s %{_bindir}/slug.py $RPM_BUILD_ROOT%{_libdir}/git-core/git-pld
 echo ".so slug.py.1" > $RPM_BUILD_ROOT%{_mandir}/man1/git-pld.1
 
-install -D %SOURCE1 $RPM_BUILD_ROOT/etc/rc.d/init.d/slug_watch
+install -Dp %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/slug_watch
 install -d $RPM_BUILD_ROOT/home/services/git/.gitolite/hooks/common
-cp -r post-receive.python.d $RPM_BUILD_ROOT/home/services/git/.gitolite/hooks/common
+cp -rp post-receive.python.d $RPM_BUILD_ROOT/home/services/git/.gitolite/hooks/common
 install -d $RPM_BUILD_ROOT/home/services/git/{watchdir,Refs}
 touch $RPM_BUILD_ROOT/home/services/git/{watchdir,Refs}
 
-install -D %{SOURCE2} $RPM_BUILD_ROOT/etc/cron.d/slug_watch
-install -D %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/slug_watch
-install -D %{SOURCE4} $RPM_BUILD_ROOT/%{_bindir}
+install -Dp %{SOURCE2} $RPM_BUILD_ROOT/etc/cron.d/slug_watch
+install -Dp %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/slug_watch
+install -Dp %{SOURCE4} $RPM_BUILD_ROOT%{_bindir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -81,8 +81,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %preun watch
 if [ "$1" = "0" ]; then
-        %service -q slug_watch stop
-        /sbin/chkconfig --del slug_watch
+	%service -q slug_watch stop
+	/sbin/chkconfig --del slug_watch
 fi
 
 %files
@@ -92,9 +92,7 @@ fi
 %{_libdir}/git-core/git-pld
 %{_mandir}/man1/*.1*
 %{py3_sitescriptdir}/%{module}
-%if "%{py_ver}" > "2.4"
 %{py3_sitescriptdir}/git_core_slug-*.egg-info
-%endif
 
 %files watch
 %defattr(644,root,root,755)
