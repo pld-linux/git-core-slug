@@ -1,12 +1,12 @@
 %define 	module	git_slug
 Summary:	Tools to interact with PLD git repositories
 Name:		git-core-slug
-Version:	0.13.1
+Version:	0.13.2
 Release:	1
 License:	GPL v2
 Group:		Development/Building
 Source0:	https://github.com/draenog/slug/tarball/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	26402b6144bc5f560bf1dff028e15fc2
+# Source0-md5:	a2b8365049b423fd3b332292f031ce0d
 Source1:	slug_watch.init
 Source2:	crontab
 Source3:	slug_watch.sysconfig
