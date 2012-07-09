@@ -1,5 +1,6 @@
 %define 	module	git_slug
 Summary:	Tools to interact with PLD git repositories
+Summary(pl.UTF-8):	Narzędzia do pracy z repozytoriami gita w PLD
 Name:		git-core-slug
 Version:	0.13.2
 Release:	1
@@ -26,8 +27,12 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %description
 Python tools to interact with PLD git repositories.
 
+%description -l pl.UTF-8
+Narzędzia w Pythonie do pracy z repozytoriami gita w PLD.
+
 %package watch
 Summary:	Daemon to update Refs repository for git-slug
+Summary(pl.UTF-8):	Demon uaktualniający repozytorium Refs dla git-slug
 Group:		Development/Building
 Requires:	git-core-slug
 Requires:	pld-gitolite
@@ -39,13 +44,17 @@ Requires:	rc-scripts
 Daemon to update Refs repository for git-slug. It is to be run on PLD
 gitolite server.
 
+%description watch -l pl.UTF-8
+Demon uaktualniający repozytorium Refs dla git-slug. Jest przeznaczony
+do uruchamiania na serwerze gitolite PLD.
+
 %prep
 %setup -qc
 mv draenog-slug-*/* .
 
 %build
 %{__python3} setup.py build
-%{make} man
+%{__make} man
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -90,7 +99,8 @@ fi
 %doc HOWTO Changelog
 %attr(755,root,root) %{_bindir}/slug.py
 %{_libdir}/git-core/git-pld
-%{_mandir}/man1/*.1*
+%{_mandir}/man1/git-pld.1*
+%{_mandir}/man1/slug.py.1*
 %{py3_sitescriptdir}/%{module}
 %{py3_sitescriptdir}/git_core_slug-*.egg-info
 
