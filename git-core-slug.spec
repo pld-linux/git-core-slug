@@ -3,7 +3,7 @@ Summary:	Tools to interact with PLD git repositories
 Summary(pl.UTF-8):	Narzędzia do pracy z repozytoriami gita w PLD
 Name:		git-core-slug
 Version:	0.13.2
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Development/Building
 Source0:	https://github.com/draenog/slug/tarball/v%{version}/%{name}-%{version}.tar.gz
@@ -111,9 +111,15 @@ fi
 %attr(754,root,root) /etc/rc.d/init.d/slug_watch
 %config(noreplace) %verify(not md5 mtime size) /etc/cron.d/slug_watch
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/slug_watch
+%{py3_sitescriptdir}/Daemon
+
+%defattr(644,git,git,755)
+%dir /home/services/git
+%dir /home/services/git/adc
+%dir /home/services/git/adc/bin
 %attr(755,git,git) /home/services/git/adc/bin/trash
 %attr(755,git,git) /home/services/git/adc/bin/move
-%{py3_sitescriptdir}/Daemon
-%attr(644,git,git) /home/services/git/.gitolite/hooks/common/post-receive.python.d/slug_hook.py
-%attr(744,git,git) %dir /home/services/git/watchdir
-%attr(744,git,git) %dir /home/services/git/Refs
+%dir /home/services/git/.gitolite/hooks/common/post-receive.python.d
+/home/services/git/.gitolite/hooks/common/post-receive.python.d/slug_hook.py
+%dir /home/services/git/watchdir
+%dir /home/services/git/Refs
