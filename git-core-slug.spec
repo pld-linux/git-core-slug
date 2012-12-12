@@ -2,12 +2,12 @@
 Summary:	Tools to interact with PLD git repositories
 Summary(pl.UTF-8):	Narzędzia do pracy z repozytoriami gita w PLD
 Name:		git-core-slug
-Version:	0.13.2
-Release:	3
+Version:	0.13.3
+Release:	1
 License:	GPL v2
 Group:		Development/Building
 Source0:	https://github.com/draenog/slug/tarball/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	a2b8365049b423fd3b332292f031ce0d
+# Source0-md5:	16b099163afee50976d5dedfc4a3b7aa
 Source1:	slug_watch.init
 Source2:	crontab
 Source3:	slug_watch.sysconfig
@@ -96,7 +96,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc HOWTO Changelog
+%doc HOWTO
 %attr(755,root,root) %{_bindir}/slug.py
 %{_libdir}/git-core/git-pld
 %{_mandir}/man1/git-pld.1*
@@ -114,9 +114,6 @@ fi
 %{py3_sitescriptdir}/Daemon
 
 %defattr(644,git,git,755)
-%dir /home/services/git
-%dir /home/services/git/adc
-%dir /home/services/git/adc/bin
 %attr(755,git,git) /home/services/git/adc/bin/trash
 %attr(755,git,git) /home/services/git/adc/bin/move
 %dir /home/services/git/.gitolite/hooks/common/post-receive.python.d
