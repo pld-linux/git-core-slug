@@ -2,12 +2,12 @@
 Summary:	Tools to interact with PLD git repositories
 Summary(pl.UTF-8):	Narzędzia do pracy z repozytoriami gita w PLD
 Name:		git-core-slug
-Version:	0.13.3
+Version:	0.13.4
 Release:	1
 License:	GPL v2
 Group:		Development/Building
 Source0:	https://github.com/draenog/slug/tarball/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	16b099163afee50976d5dedfc4a3b7aa
+# Source0-md5:	b6e6f24006b0a56378e91c0bc8daf5b1
 Source1:	slug_watch.init
 Source2:	crontab
 Source3:	slug_watch.sysconfig
@@ -15,7 +15,7 @@ Source4:	slug_watch-cron
 URL:		https://github.com/draenog/slug
 BuildRequires:	asciidoc
 BuildRequires:	docbook-dtd45-xml
-BuildRequires:	python3-modules
+BuildRequires:	python3-modules >= 1:3.3.0
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.228
 BuildRequires:	xmlto
@@ -116,6 +116,7 @@ fi
 %defattr(644,git,git,755)
 %attr(755,git,git) /home/services/git/adc/bin/trash
 %attr(755,git,git) /home/services/git/adc/bin/move
+/home/services/git/adc/bin/copy
 %dir /home/services/git/.gitolite/hooks/common/post-receive.python.d
 /home/services/git/.gitolite/hooks/common/post-receive.python.d/slug_hook.py
 %dir /home/services/git/watchdir
