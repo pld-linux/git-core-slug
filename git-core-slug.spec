@@ -3,7 +3,7 @@ Summary:	Tools to interact with PLD git repositories
 Summary(pl.UTF-8):	Narzędzia do pracy z repozytoriami gita w PLD
 Name:		git-core-slug
 Version:	0.13.4
-Release:	1
+Release:	3
 License:	GPL v2
 Group:		Development/Building
 Source0:	https://github.com/draenog/slug/tarball/v%{version}/%{name}-%{version}.tar.gz
@@ -34,11 +34,12 @@ Narzędzia w Pythonie do pracy z repozytoriami gita w PLD.
 Summary:	Daemon to update Refs repository for git-slug
 Summary(pl.UTF-8):	Demon uaktualniający repozytorium Refs dla git-slug
 Group:		Development/Building
+Requires(post,preun):	/sbin/chkconfig
 Requires:	git-core-slug
 Requires:	pld-gitolite
 Requires:	python3-pyinotify
-Requires(post,preun):	/sbin/chkconfig
 Requires:	rc-scripts
+Suggests:	crondaemon
 
 %description watch
 Daemon to update Refs repository for git-slug. It is to be run on PLD
