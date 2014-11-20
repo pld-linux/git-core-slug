@@ -1,6 +1,6 @@
 --- a/slug.py	2014-10-19 18:07:38.000000000 +0200
-+++ b/slug.py	2014-11-20 22:14:19.182018701 +0100
-@@ -7,26 +7,18 @@
++++ b/slug.py	2014-11-20 22:31:39.005919529 +0100
+@@ -7,26 +7,18 @@ import os
  import shutil
  import subprocess
  import queue
@@ -30,7 +30,7 @@
  class UnquoteConfig(configparser.ConfigParser):
      def get(self, section, option, **kwargs):
          value = super().get(section, option, **kwargs)
-@@ -43,25 +35,15 @@
+@@ -43,25 +35,15 @@ class DelAppend(argparse._AppendAction):
          item.append(values)
          setattr(namespace, self.dest, item)
  
@@ -65,7 +65,7 @@
  
  def readconfig(path):
      config = UnquoteConfig(delimiters='=', interpolation=None, strict=False)
-@@ -114,18 +96,19 @@
+@@ -114,18 +96,19 @@ def getrefs(*args):
          sys.exit(2)
      return refs
  
@@ -94,7 +94,7 @@
      for pkgdir in sorted(refs.heads):
          gitdir = os.path.join(options.packagesdir, pkgdir, '.git')
          if not os.path.isdir(gitdir):
-@@ -143,9 +126,18 @@
+@@ -143,9 +126,18 @@ def fetch_packages(options, return_all=F
                  ref2fetch.append('+{}:{}/{}'.format(ref, REMOTEREFS, ref[len('refs/heads/'):]))
          if ref2fetch:
              ref2fetch.append('refs/notes/*:refs/notes/*')
@@ -115,7 +115,7 @@
  
      if options.prune:
          refs = getrefs('*')
-@@ -158,26 +150,60 @@
+@@ -158,26 +150,60 @@ def fetch_packages(options, return_all=F
      if return_all:
          return refs.heads
      else:
@@ -140,8 +140,8 @@
 -            repo.checkout(options.checkout)
 -        except GitRepoError as e:
 -            print('Problem with checking branch {} in repo {}: {}'.format(options.checkout, repo.gdir, e), file=sys.stderr)
-+        repos.append((GitRepo(os.path.join(options.packagesdir, pkgdir)), options.checkout))
-+    pool = multiprocessing.Poll(options.jobs)
++        repos.append(GitRepo(os.path.join(options.packagesdir, pkgdir)))
++    pool = WorkerPool(options.jobs)
 +    try:
 +        pool.starmap(checkout_package, zip(repos, [options] * len(repos)))
 +    except KeyboardInterrupt:
@@ -163,7 +163,7 @@
 -        except GitRepoError as e:
 -            print('Problem with checking branch master in repo {}: {}'.format(repo.gdir, e), file=sys.stderr)
 +    repos = fetch_packages(options)
-+    pool = multiprocessing.Poll(options.jobs)
++    pool = WorkerPool(options.jobs)
 +    try:
 +        pool.starmap(clone_package, zip(repos, [options] * len(repos)))
 +    except KeyboardInterrupt:
@@ -187,7 +187,7 @@
  
  def pull_packages(options):
      repolist = []
-@@ -189,19 +215,14 @@
+@@ -189,19 +215,14 @@ def pull_packages(options):
      else:
          repolist = fetch_packages(options, False)
      print('--------Pulling------------')
@@ -215,7 +215,7 @@
  
  def list_packages(options):
      refs = getrefs(options.branch, options.repopattern)
-@@ -213,7 +234,7 @@
+@@ -213,7 +234,7 @@ common_options.add_argument('-d', '--pac
      default=os.path.expanduser('~/rpm/packages'))
  
  common_fetchoptions = argparse.ArgumentParser(add_help=False, parents=[common_options])
