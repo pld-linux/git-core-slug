@@ -52,7 +52,7 @@ index 4354ac4..67592f8 100644
          for line in data:
              (sha1_old, sha1, ref) = line.split()
 diff --git a/slug.py b/slug.py
-index 69bd3b9..68f68cd 100755
+index 69bd3b9..b4ac0fd 100755
 --- a/slug.py
 +++ b/slug.py
 @@ -7,26 +7,18 @@ import os
@@ -120,7 +120,7 @@ index 69bd3b9..68f68cd 100755
  
  def readconfig(path):
      config = UnquoteConfig(delimiters='=', interpolation=None, strict=False)
-@@ -114,38 +96,60 @@ def getrefs(*args):
+@@ -114,38 +96,62 @@ def getrefs(*args):
          sys.exit(2)
      return refs
  
@@ -140,6 +140,8 @@ index 69bd3b9..68f68cd 100755
 +            ref2fetch.append('+{}:{}/{}'.format(ref, REMOTEREFS, ref[len('refs/heads/'):]))
 +    if ref2fetch:
 +        ref2fetch.append('refs/notes/*:refs/notes/*')
++    else:
++        return
  
 +    try:
 +        (stdout, stderr) = gitrepo.fetch(ref2fetch, options.depth)
@@ -205,7 +207,7 @@ index 69bd3b9..68f68cd 100755
  
      if options.prune:
          refs = getrefs('*')
-@@ -158,26 +162,60 @@ def fetch_packages(options, return_all=False):
+@@ -158,26 +164,60 @@ def fetch_packages(options, return_all=False):
      if return_all:
          return refs.heads
      else:
@@ -277,7 +279,7 @@ index 69bd3b9..68f68cd 100755
  
  def pull_packages(options):
      repolist = []
-@@ -189,19 +227,14 @@ def pull_packages(options):
+@@ -189,19 +229,14 @@ def pull_packages(options):
      else:
          repolist = fetch_packages(options, False)
      print('--------Pulling------------')
@@ -305,7 +307,7 @@ index 69bd3b9..68f68cd 100755
  
  def list_packages(options):
      refs = getrefs(options.branch, options.repopattern)
-@@ -213,7 +246,7 @@ common_options.add_argument('-d', '--packagesdir', help='local directory with gi
+@@ -213,7 +248,7 @@ common_options.add_argument('-d', '--packagesdir', help='local directory with gi
      default=os.path.expanduser('~/rpm/packages'))
  
  common_fetchoptions = argparse.ArgumentParser(add_help=False, parents=[common_options])
@@ -314,7 +316,7 @@ index 69bd3b9..68f68cd 100755
  common_fetchoptions.add_argument('repopattern', nargs='*', default = ['*'])
  common_fetchoptions.add_argument('--depth', help='depth of fetch', default=0)
  
-@@ -253,10 +286,14 @@ default_options['fetch'] = {'branch': '[*]', 'prune': False, 'newpkgs': False, '
+@@ -253,10 +288,14 @@ default_options['fetch'] = {'branch': '[*]', 'prune': False, 'newpkgs': False, '
  
  pull = subparsers.add_parser('pull', help='git-pull in all existing repositories', parents=[common_fetchoptions],
          formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -331,51 +333,3 @@ index 69bd3b9..68f68cd 100755
  
  checkout =subparsers.add_parser('checkout', help='checkout repositories', parents=[common_fetchoptions],
          formatter_class=argparse.RawDescriptionHelpFormatter)
-diff --git a/slug_watch b/slug_watch
-index 7b64460..b077de9 100755
---- a/slug_watch
-+++ b/slug_watch
-@@ -23,6 +23,7 @@ LOCKFILE = 'slug_watch.lock'
- PROJECTS_LIST = 'projects.list'
- PROJECTS_LIST_NEW = PROJECTS_LIST + '.new'
- PROJECTS_LIST_HEAD = PROJECTS_LIST + '.head'
-+PROJECTS_LIST_GITWEB = PROJECTS_LIST + ".gitweb"
- REFFILE_NEW = REFFILE + '.new'
- REFREPO_WDIR = 'Refs'
- 
-@@ -63,10 +64,11 @@ def process_file(pathname):
-         print('{} is not an ordinary file'.format(pathname))
-         return
- 
--    try:
--        shutil.copyfile(PROJECTS_LIST_HEAD, PROJECTS_LIST_NEW)
--    except (OSError, shutil.Error):
--        logger.error('Cannot write {}'.format(PROJECTS_LIST_NEW))
-+    if os.path.isfile(PROJECTS_LIST_HEAD):
-+        try:
-+            shutil.copyfile(PROJECTS_LIST_HEAD, PROJECTS_LIST_NEW)
-+        except (OSError, shutil.Error):
-+            logger.error('Cannot write {}'.format(PROJECTS_LIST_NEW))
- 
-     with open(os.path.join(REFREPO_WDIR, REFFILE),'w') as headfile_new, open(pathname, 'r') as newfile, \
-             open(PROJECTS_LIST_NEW,'a') as projects:
-@@ -82,7 +84,7 @@ def process_file(pathname):
-                 if sha1 != EMPTYSHA1:
-                     print(sha1, ref, repo, file=headfile_new)
-                     if repo != oldtuple[0]:
--                        print(quote_plus('packages/'+repo+'.git', safe='/'), file=projects)
-+                        print('packages/'+repo+'.git', file=projects)
-                 oldtuple = (repo, ref)
-         except ValueError:
-             logger.error("Problem with file: {}".format(pathname))
-@@ -90,6 +92,10 @@ def process_file(pathname):
-         process.wait()
- 
-     os.rename(PROJECTS_LIST_NEW, PROJECTS_LIST)
-+    with open(PROJECTS_LIST, 'r') as projects, open(PROJECTS_LIST_GITWEB, 'w') as output:
-+        for line in projects:
-+            print(quote_plus(line, safe='/\n'), end='', file=output)
-+
-     headrepo = GitRepo(REFREPO_WDIR, REFREPO_GDIR)
-     headrepo.commitfile(REFFILE, 'Changes by {}'.format(committer))
-     os.remove(pathname)
