@@ -1,5 +1,74 @@
---- a/slug.py	2014-10-19 18:07:38.000000000 +0200
-+++ b/slug.py	2014-11-20 22:31:39.005919529 +0100
+commit 29ab16f193cf3ebccb0c044b98f2ba9be98c3090
+Author: Arkadiusz Miśkiewicz <arekm@maven.pl>
+Date:   Sun Nov 23 00:32:46 2014 +0100
+
+    Make updateall off by default.
+    
+    Turn updateall to off by default so 'git pld pull' will only checkout
+    packages that were fetched at this session. If you want old behaviour
+    use 'git pld pull --all'.
+
+diff --git a/slug.py b/slug.py
+index d083cf4..fa8fd89 100755
+--- a/slug.py
++++ b/slug.py
+@@ -274,7 +274,7 @@ default_options['fetch'] = {'branch': '[*]', 'prune': False, 'newpkgs': False, '
+ 
+ pull = subparsers.add_parser('pull', help='git-pull in all existing repositories', parents=[common_fetchoptions],
+         formatter_class=argparse.RawDescriptionHelpFormatter)
+-pull.add_argument('--all', help='update local branches in all repositories', dest='updateall', action='store_true', default=True)
++pull.add_argument('--all', help='update local branches in all repositories', dest='updateall', action='store_true', default=False)
+ pull.add_argument('--noall', help='update local branches only when something has been fetched', dest='updateall', action='store_false', default=True)
+ newpkgsopt = pull.add_mutually_exclusive_group()
+ newpkgsopt.add_argument('-n', '--newpkgs', help='download packages that do not exist on local side',
+
+commit da9abb0e6d7ef1a1440e7f5ac4ad4dbf5538dc99
+Author: Arkadiusz Miśkiewicz <arekm@maven.pl>
+Date:   Sun Nov 23 00:28:22 2014 +0100
+
+    Add --newpkgs/--nonewpkgs to pull command.
+    
+    Allow 'git pld pull --newpkgs' to also fetch and pull new packages. Off
+    by default.
+
+diff --git a/slug.py b/slug.py
+index da9c050..d083cf4 100755
+--- a/slug.py
++++ b/slug.py
+@@ -276,8 +276,12 @@ pull = subparsers.add_parser('pull', help='git-pull in all existing repositories
+         formatter_class=argparse.RawDescriptionHelpFormatter)
+ pull.add_argument('--all', help='update local branches in all repositories', dest='updateall', action='store_true', default=True)
+ pull.add_argument('--noall', help='update local branches only when something has been fetched', dest='updateall', action='store_false', default=True)
++newpkgsopt = pull.add_mutually_exclusive_group()
++newpkgsopt.add_argument('-n', '--newpkgs', help='download packages that do not exist on local side',
++        action='store_true')
++newpkgsopt.add_argument('-nn', '--nonewpkgs', help='do not download new packages', dest='newpkgs', action='store_false')
+ pull.set_defaults(func=pull_packages, branch='[*]', prune=False, newpkgs=False, omitexisting=False)
+-default_options['pull'] = {'branch': ['*'], 'prune': False, 'newpkgs': False, 'omitexisting': False}
++default_options['pull'] = {'branch': ['*'], 'prune': False, 'omitexisting': False}
+ 
+ checkout =subparsers.add_parser('checkout', help='checkout repositories', parents=[common_fetchoptions],
+         formatter_class=argparse.RawDescriptionHelpFormatter)
+
+commit b1096c634ea9b262bd791863d68e2aed3847078d
+Author: Arkadiusz Miśkiewicz <arekm@maven.pl>
+Date:   Sun Nov 23 00:18:38 2014 +0100
+
+    Parallelize fetching, checking out, cloning.
+    
+    Parallelize fetching, checking out, cloning using multiprocessing
+    module.
+    
+    By default use number of parallel processes equal to number of
+    system CPUs (use old value, 4, as fallback).
+    
+    Also replace thread based ThreadFetch() with the same multiprocessing
+    mechanism as above for consistency.
+
+diff --git a/slug.py b/slug.py
+index 69bd3b9..da9c050 100755
+--- a/slug.py
++++ b/slug.py
 @@ -7,26 +7,18 @@ import os
  import shutil
  import subprocess
@@ -94,13 +163,14 @@
      for pkgdir in sorted(refs.heads):
          gitdir = os.path.join(options.packagesdir, pkgdir, '.git')
          if not os.path.isdir(gitdir):
-@@ -143,9 +126,18 @@ def fetch_packages(options, return_all=F
+@@ -143,9 +126,18 @@ def fetch_packages(options, return_all=False):
                  ref2fetch.append('+{}:{}/{}'.format(ref, REMOTEREFS, ref[len('refs/heads/'):]))
          if ref2fetch:
              ref2fetch.append('refs/notes/*:refs/notes/*')
 -            fetch_queue.put((gitrepo, ref2fetch))
 +            args.append((gitrepo, ref2fetch, options))
-+
+ 
+-    fetch_queue.join()
 +    pool = WorkerPool(options.jobs, pool_worker_init)
 +    try:
 +        updated_repos = pool.starmap(fetch_package, args)
@@ -109,13 +179,12 @@
 +    else:
 +        pool.close()
 +    pool.join()
- 
--    fetch_queue.join()
++
 +    updated_repos = list(filter(None, updated_repos))
  
      if options.prune:
          refs = getrefs('*')
-@@ -158,26 +150,60 @@ def fetch_packages(options, return_all=F
+@@ -158,26 +150,60 @@ def fetch_packages(options, return_all=False):
      if return_all:
          return refs.heads
      else:
@@ -215,7 +284,7 @@
  
  def list_packages(options):
      refs = getrefs(options.branch, options.repopattern)
-@@ -213,7 +234,7 @@ common_options.add_argument('-d', '--pac
+@@ -213,7 +234,7 @@ common_options.add_argument('-d', '--packagesdir', help='local directory with gi
      default=os.path.expanduser('~/rpm/packages'))
  
  common_fetchoptions = argparse.ArgumentParser(add_help=False, parents=[common_options])
@@ -224,3 +293,43 @@
  common_fetchoptions.add_argument('repopattern', nargs='*', default = ['*'])
  common_fetchoptions.add_argument('--depth', help='depth of fetch', default=0)
  
+
+commit fac30722a98a4d6300822fd3f790ce1fa48e7d83
+Author: Arkadiusz Miśkiewicz <arekm@maven.pl>
+Date:   Sun Nov 23 00:15:10 2014 +0100
+
+    check_remote(): Add support to packed refs database.
+    
+    check_remote() did not handle git packed refs database. That made
+    fetch_packages() to always fetch packages even if we already had
+    them fetched.
+    
+    Supporting packed refs database fixes this problem.
+
+diff --git a/git_slug/gitrepo.py b/git_slug/gitrepo.py
+index 5234deb..d9f88ee 100644
+--- a/git_slug/gitrepo.py
++++ b/git_slug/gitrepo.py
+@@ -82,12 +82,21 @@ class GitRepo:
+             'refs/notes/*:refs/notes/*'])
+ 
+     def check_remote(self, ref, remote=REMOTE_NAME):
++        localref = EMPTYSHA1
+         ref = ref.replace(REFFILE, os.path.join('remotes', remote))
+         try:
+             with open(os.path.join(self.gdir, ref), 'r') as f:
+                 localref = f.readline().strip()
+         except IOError:
+-            localref = EMPTYSHA1
++            try:
++                with open(os.path.join(self.gdir, 'packed-refs')) as f:
++                    for line in f:
++                        line_data = line.split()
++                        if len(line_data) == 2 and line_data[1] == ref:
++                            localref = line_data[0].strip()
++                            break
++            except IOError:
++                pass
+         return localref
+ 
+     def showfile(self, filename, ref="/".join([REMOTE_NAME, "master"])):

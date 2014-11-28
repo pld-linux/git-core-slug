@@ -3,7 +3,7 @@ Summary:	Tools to interact with PLD git repositories
 Summary(pl.UTF-8):	Narzędzia do pracy z repozytoriami gita w PLD
 Name:		git-core-slug
 Version:	0.13.4
-Release:	6
+Release:	7
 License:	GPL v2
 Group:		Development/Building
 Source0:	https://github.com/draenog/slug/tarball/v%{version}/%{name}-%{version}.tar.gz
@@ -12,8 +12,7 @@ Source1:	slug_watch.init
 Source2:	crontab
 Source3:	slug_watch.sysconfig
 Source4:	slug_watch-cron
-Patch0:		%{name}-packet-ref.patch
-Patch1:		%{name}-parallel.patch
+Patch0:		%{name}-git.patch
 URL:		https://github.com/draenog/slug
 BuildRequires:	asciidoc
 BuildRequires:	docbook-dtd45-xml
@@ -55,7 +54,6 @@ do uruchamiania na serwerze gitolite PLD.
 %setup -qc
 mv draenog-slug-*/* .
 %patch0 -p1
-%patch1 -p1
 
 %build
 %{__python3} setup.py build
