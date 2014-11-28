@@ -1,3 +1,138 @@
+commit 697db3c82877c46c4567e744a8bc15f1748b94f7
+Author: Arkadiusz Miśkiewicz <arekm@maven.pl>
+Date:   Fri Nov 28 12:47:40 2014 +0100
+
+    gitrepo.check_remote() is expensive, so make it run in parallel.
+    
+    gitrepo.check_remote() now runs in parallel (as part of
+    fetch_package()). Unfortunately lambdas cannot be pickled,
+    so we have to get rid of it.
+
+diff --git a/git_slug/refsdata.py b/git_slug/refsdata.py
+index 4354ac4..67592f8 100644
+--- a/git_slug/refsdata.py
++++ b/git_slug/refsdata.py
+@@ -16,7 +16,7 @@ class NoMatchedRepos(Exception):
+ 
+ class RemoteRefsData:
+     def __init__(self, stream, pattern, dirpattern=('*',)):
+-        self.heads = collections.defaultdict(lambda: collections.defaultdict(lambda: EMPTYSHA1))
++        self.heads = collections.defaultdict(self.__dict_var__)
+         pats = re.compile('|'.join(fnmatch.translate(os.path.join('refs/heads', p)) for p in pattern))
+         dirpat = re.compile('|'.join(fnmatch.translate(p) for p in dirpattern))
+         for line in stream.readlines():
+@@ -28,6 +28,12 @@ class RemoteRefsData:
+         if not self.heads:
+             raise NoMatchedRepos
+ 
++    def __dict_init__(self):
++        return EMPTYSHA1
++
++    def __dict_var__(self):
++        return collections.defaultdict(self.__dict_init__)
++
+     def put(self, repo, data):
+         for line in data:
+             (sha1_old, sha1, ref) = line.split()
+diff --git a/slug.py b/slug.py
+index b576df8..68f68cd 100755
+--- a/slug.py
++++ b/slug.py
+@@ -96,7 +96,14 @@ def getrefs(*args):
+         sys.exit(2)
+     return refs
+ 
+-def fetch_package(gitrepo, ref2fetch, options):
++def fetch_package(gitrepo, refs_heads, options):
++    ref2fetch = []
++    for ref in refs_heads:
++        if gitrepo.check_remote(ref) != refs_heads[ref]:
++            ref2fetch.append('+{}:{}/{}'.format(ref, REMOTEREFS, ref[len('refs/heads/'):]))
++    if ref2fetch:
++        ref2fetch.append('refs/notes/*:refs/notes/*')
++
+     try:
+         (stdout, stderr) = gitrepo.fetch(ref2fetch, options.depth)
+         if stderr != b'':
+@@ -130,13 +137,7 @@ def fetch_packages(options, return_all=False):
+             continue
+         else:
+             gitrepo = GitRepo(os.path.join(options.packagesdir, pkgdir))
+-        ref2fetch = []
+-        for ref in refs.heads[pkgdir]:
+-            if gitrepo.check_remote(ref) != refs.heads[pkgdir][ref]:
+-                ref2fetch.append('+{}:{}/{}'.format(ref, REMOTEREFS, ref[len('refs/heads/'):]))
+-        if ref2fetch:
+-            ref2fetch.append('refs/notes/*:refs/notes/*')
+-            args.append((gitrepo, ref2fetch, options))
++            args.append((gitrepo, refs.heads[pkgdir], options))
+ 
+     updated_repos = []
+     pool = WorkerPool(options.jobs, pool_worker_init)
+
+commit 3aa5fead45cce8c63eef64b98ce5dd215cd7dc24
+Author: Arkadiusz Miśkiewicz <arekm@maven.pl>
+Date:   Fri Nov 28 12:15:20 2014 +0100
+
+    Initialize updated_repos to empty list.
+
+diff --git a/slug.py b/slug.py
+index 914e894..b576df8 100755
+--- a/slug.py
++++ b/slug.py
+@@ -138,6 +138,7 @@ def fetch_packages(options, return_all=False):
+             ref2fetch.append('refs/notes/*:refs/notes/*')
+             args.append((gitrepo, ref2fetch, options))
+ 
++    updated_repos = []
+     pool = WorkerPool(options.jobs, pool_worker_init)
+     try:
+         updated_repos = pool.starmap(fetch_package, args)
+
+commit 3482f3141eb1ecc9cc44d7b6d5af359960a49e73
+Author: Arkadiusz Miśkiewicz <arekm@maven.pl>
+Date:   Fri Nov 28 12:13:27 2014 +0100
+
+    Parallelize initpackage operation.
+
+diff --git a/slug.py b/slug.py
+index fa8fd89..914e894 100755
+--- a/slug.py
++++ b/slug.py
+@@ -108,15 +108,25 @@ def fetch_package(gitrepo, ref2fetch, options):
+ def fetch_packages(options, return_all=False):
+     refs = getrefs(options.branch, options.repopattern)
+     print('Read remotes data')
++    pkgs_new = []
++    if options.newpkgs:
++        for pkgdir in sorted(refs.heads):
++            gitdir = os.path.join(options.packagesdir, pkgdir, '.git')
++            if not os.path.isdir(gitdir):
++                pkgs_new.append(pkgdir)
++
++        pool = WorkerPool(options.jobs, pool_worker_init)
++        try:
++            pool.starmap(initpackage, zip(pkgs_new, [options] * len(pkgs_new)))
++        except KeyboardInterrupt:
++            pool.terminate()
++        else:
++            pool.close()
++        pool.join()
++
+     args = []
+     for pkgdir in sorted(refs.heads):
+-        gitdir = os.path.join(options.packagesdir, pkgdir, '.git')
+-        if not os.path.isdir(gitdir):
+-            if options.newpkgs:
+-                gitrepo = initpackage(pkgdir, options)
+-            else:
+-                continue
+-        elif options.omitexisting:
++        if options.omitexisting and pkgdir not in pkgs_new:
+             continue
+         else:
+             gitrepo = GitRepo(os.path.join(options.packagesdir, pkgdir))
+
 commit 29ab16f193cf3ebccb0c044b98f2ba9be98c3090
 Author: Arkadiusz Miśkiewicz <arekm@maven.pl>
 Date:   Sun Nov 23 00:32:46 2014 +0100
