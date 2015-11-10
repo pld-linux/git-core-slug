@@ -312,3 +312,15 @@ index 69bd3b9..17a67e7 100755
  
  checkout =subparsers.add_parser('checkout', help='checkout repositories', parents=[common_fetchoptions],
          formatter_class=argparse.RawDescriptionHelpFormatter)
+diff --git a/slug.py b/slug.py
+index 69bd3b9..9238cc9 100755
+--- a/slug.py
++++ b/slug.py
+@@ -65,7 +65,6 @@ class ThreadFetch(threading.Thread):
+ 
+ def readconfig(path):
+     config = UnquoteConfig(delimiters='=', interpolation=None, strict=False)
+-    config.read(path)
+     try:
+         config.read(path)
+     except UnicodeDecodeError:

@@ -3,7 +3,7 @@ Summary:	Tools to interact with PLD git repositories
 Summary(pl.UTF-8):	Narzędzia do pracy z repozytoriami gita w PLD
 Name:		git-core-slug
 Version:	0.13.4
-Release:	12
+Release:	13
 License:	GPL v2
 Group:		Development/Building
 Source0:	https://github.com/draenog/slug/tarball/v%{version}/%{name}-%{version}.tar.gz
