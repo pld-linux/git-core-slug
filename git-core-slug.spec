@@ -16,6 +16,7 @@ Patch0:		%{name}-git.patch
 URL:		https://github.com/draenog/slug
 BuildRequires:	asciidoc
 BuildRequires:	docbook-dtd45-xml
+BuildRequires:	git-core >= 2.7.1-3
 BuildRequires:	python3-modules >= 1:3.3.0
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.714
@@ -26,7 +27,7 @@ Suggests:	openssh-clients
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		gitcoredir	%{_prefix}/lib/git-core
+%define		gitcoredir	%(git --exec-path)
 
 %description
 Python tools to interact with PLD Linux git repositories.
