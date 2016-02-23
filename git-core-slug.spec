@@ -1,9 +1,9 @@
 %define 	module	git_slug
-Summary:	Tools to interact with PLD git repositories
-Summary(pl.UTF-8):	Narzędzia do pracy z repozytoriami gita w PLD
+Summary:	Tools to interact with PLD Linux git repositories
+Summary(pl.UTF-8):	Narzędzia do pracy z repozytoriami gita w PLD Linuksa
 Name:		git-core-slug
 Version:	0.13.4
-Release:	13
+Release:	14
 License:	GPL v2
 Group:		Development/Building
 Source0:	https://github.com/draenog/slug/tarball/v%{version}/%{name}-%{version}.tar.gz
@@ -23,10 +23,13 @@ BuildRequires:	xmlto
 Requires:	git-core
 Requires:	python3-modules
 Suggests:	openssh-clients
+BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
+%define		gitcoredir	%{_prefix}/lib/git-core
+
 %description
-Python tools to interact with PLD git repositories.
+Python tools to interact with PLD Linux git repositories.
 
 %description -l pl.UTF-8
 Narzędzia w Pythonie do pracy z repozytoriami gita w PLD.
@@ -67,8 +70,8 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} man-install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-install -d $RPM_BUILD_ROOT%{_libdir}/git-core
-ln -s %{_bindir}/slug.py $RPM_BUILD_ROOT%{_libdir}/git-core/git-pld
+install -d $RPM_BUILD_ROOT%{gitcoredir}
+ln -s %{_bindir}/slug.py $RPM_BUILD_ROOT%{gitcoredir}/git-pld
 echo ".so slug.py.1" > $RPM_BUILD_ROOT%{_mandir}/man1/git-pld.1
 
 install -Dp %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/slug_watch
@@ -98,7 +101,7 @@ fi
 %defattr(644,root,root,755)
 %doc HOWTO
 %attr(755,root,root) %{_bindir}/slug.py
-%{_libdir}/git-core/git-pld
+%{gitcoredir}/git-pld
 %{_mandir}/man1/git-pld.1*
 %{_mandir}/man1/slug.py.1*
 %{py3_sitescriptdir}/%{module}
