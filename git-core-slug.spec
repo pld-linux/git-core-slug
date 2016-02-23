@@ -18,7 +18,7 @@ BuildRequires:	asciidoc
 BuildRequires:	docbook-dtd45-xml
 BuildRequires:	python3-modules >= 1:3.3.0
 BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.228
+BuildRequires:	rpmbuild(macros) >= 1.714
 BuildRequires:	xmlto
 Requires:	git-core
 Requires:	python3-modules
@@ -56,16 +56,13 @@ mv draenog-slug-*/* .
 %patch0 -p1
 
 %build
-%{__python3} setup.py build
+%py3_build
 %{__make} man
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%{__python3} setup.py install \
+%py3_install \
 	--install-data=/home/services/git \
-	--skip-build \
-	--optimize=2 \
-	--root=$RPM_BUILD_ROOT
 
 %{__make} man-install \
 	DESTDIR=$RPM_BUILD_ROOT
