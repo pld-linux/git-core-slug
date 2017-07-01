@@ -1,9 +1,9 @@
-%define 	module	git_slug
+%define		module	git_slug
 Summary:	Tools to interact with PLD Linux git repositories
 Summary(pl.UTF-8):	Narzędzia do pracy z repozytoriami gita w PLD Linuksa
 Name:		git-core-slug
 Version:	0.13.4
-Release:	15
+Release:	16
 License:	GPL v2
 Group:		Development/Building
 Source0:	https://github.com/draenog/slug/tarball/v%{version}/%{name}-%{version}.tar.gz
@@ -24,7 +24,6 @@ BuildRequires:	xmlto
 Requires:	git-core
 Requires:	python3-modules
 Suggests:	openssh-clients
-BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		gitcoredir	%(git --exec-path)
