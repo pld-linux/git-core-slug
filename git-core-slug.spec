@@ -12,7 +12,7 @@ Source1:	slug_watch.init
 Source2:	crontab
 Source3:	slug_watch.sysconfig
 Source4:	slug_watch-cron
-URL:		https://github.com/draenog/slug
+URL:		https://git.pld-linux.org/gitweb.cgi/?p=projects/git-slug.git;a=summary
 BuildRequires:	asciidoc
 BuildRequires:	docbook-dtd45-xml
 BuildRequires:	git-core >= 2.7.1-3
