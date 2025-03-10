@@ -3,7 +3,7 @@ Summary:	Tools to interact with PLD Linux git repositories
 Summary(pl.UTF-8):	Narzędzia do pracy z repozytoriami gita w PLD Linuksa
 Name:		git-core-slug
 Version:	0.14
-Release:	4
+Release:	5
 License:	GPL v2
 Group:		Development/Building
 Source0:	%{name}-%{version}.tar.gz
