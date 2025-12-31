@@ -1,5 +1,0 @@
-SHELL=/bin/sh
-MAILTO=root
-
-03 5 * * *     git /usr/bin/slug_watch-cron --aggressive
-*/15 * * * *   git /usr/bin/slug_watch-cron

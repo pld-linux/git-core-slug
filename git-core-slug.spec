@@ -2,16 +2,12 @@
 Summary:	Tools to interact with PLD Linux git repositories
 Summary(pl.UTF-8):	Narzędzia do pracy z repozytoriami gita w PLD Linuksa
 Name:		git-core-slug
-Version:	0.14
-Release:	5
+Version:	0.15
+Release:	1
 License:	GPL v2
 Group:		Development/Building
-Source0:	%{name}-%{version}.tar.gz
-# Source0-md5:	94d40c83999c0ea1d085fb436beede19
-Source1:	slug_watch.init
-Source2:	crontab
-Source3:	slug_watch.sysconfig
-Source4:	slug_watch-cron
+Source0:	%{name}-%{version}.tar.xz
+# Source0-md5:	6cdb2ba9c6d0270c68160ec57bc2bfae
 URL:		https://git.pld-linux.org/gitweb.cgi/?p=projects/git-slug.git;a=summary
 BuildRequires:	asciidoc
 BuildRequires:	docbook-dtd45-xml
@@ -73,15 +69,17 @@ install -d $RPM_BUILD_ROOT%{gitcoredir}
 ln -s %{_bindir}/slug.py $RPM_BUILD_ROOT%{gitcoredir}/git-pld
 echo ".so slug.py.1" > $RPM_BUILD_ROOT%{_mandir}/man1/git-pld.1
 
-install -Dp %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/slug_watch
+install -Dp watch/slug_watch.init $RPM_BUILD_ROOT/etc/rc.d/init.d/slug_watch
 install -d $RPM_BUILD_ROOT/home/services/git/.gitolite/hooks/common
 cp -rp post-receive.python.d $RPM_BUILD_ROOT/home/services/git/.gitolite/hooks/common
 install -d $RPM_BUILD_ROOT/home/services/git/{watchdir,Refs}
 touch $RPM_BUILD_ROOT/home/services/git/{watchdir,Refs}
 
-install -Dp %{SOURCE2} $RPM_BUILD_ROOT/etc/cron.d/slug_watch
-install -Dp %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/slug_watch
-install -Dp %{SOURCE4} $RPM_BUILD_ROOT%{_bindir}
+install -Dp watch/crontab $RPM_BUILD_ROOT/etc/cron.d/slug_watch
+install -Dp watch/slug_watch.sysconfig $RPM_BUILD_ROOT/etc/sysconfig/slug_watch
+install -Dp watch/slug_watch-cron $RPM_BUILD_ROOT%{_bindir}
+
+install -Dp watch/slug_watch.service $RPM_BUILD_ROOT%{systemdunitdir}/slug_watch.service
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -89,12 +87,17 @@ rm -rf $RPM_BUILD_ROOT
 %post watch
 /sbin/chkconfig --add slug_watch
 %service slug_watch restart
+%systemd_post slug_watch.service
 
 %preun watch
 if [ "$1" = "0" ]; then
 	%service -q slug_watch stop
 	/sbin/chkconfig --del slug_watch
 fi
+%systemd_preun slug_watch.service
+
+%postun watch
+%systemd_postun_with_restart slug_watch.service
 
 %files
 %defattr(644,root,root,755)
@@ -111,6 +114,7 @@ fi
 %attr(755,root,root) %{_bindir}/slug_watch
 %attr(755,root,root) %{_bindir}/slug_watch-cron
 %attr(754,root,root) /etc/rc.d/init.d/slug_watch
+%{systemdunitdir}/slug_watch.service
 %config(noreplace) %verify(not md5 mtime size) /etc/cron.d/slug_watch
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/slug_watch
 %{py3_sitescriptdir}/Daemon

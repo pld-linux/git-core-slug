@@ -1,6 +1,0 @@
-# If the path is not absolute it is interpret in respect of home directory of
-# user running slug_watch daemon
-WATCHDIR="watchdir"
-REFREPODIR="repositories"
-
-OTHER_OPTIONS="-m root -s git"
