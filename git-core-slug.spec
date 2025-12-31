@@ -1,13 +1,13 @@
-%define 	module	git_slug
+%define		module	git_slug
 Summary:	Tools to interact with PLD Linux git repositories
 Summary(pl.UTF-8):	Narzędzia do pracy z repozytoriami gita w PLD Linuksa
 Name:		git-core-slug
-Version:	0.15
+Version:	0.15.1
 Release:	1
 License:	GPL v2
 Group:		Development/Building
-Source0:	%{name}-%{version}.tar.xz
-# Source0-md5:	6cdb2ba9c6d0270c68160ec57bc2bfae
+Source0:	%{name}-%{version}.tar.gz
+# Source0-md5:	4f5dcce46f119ff458b9244d159190e5
 URL:		https://git.pld-linux.org/gitweb.cgi/?p=projects/git-slug.git;a=summary
 BuildRequires:	asciidoc
 BuildRequires:	docbook-dtd45-xml
@@ -51,7 +51,7 @@ Demon uaktualniający repozytorium Refs dla git-slug. Jest przeznaczony
 do uruchamiania na serwerze gitolite PLD.
 
 %prep
-%setup -q
+%setup -q -n git_core_slug-%{version}
 
 %build
 %py3_build
